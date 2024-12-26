@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MILWAN WIFI</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+
+        .navbar {
+            background-color: #343a40;
+            padding: 1rem;
+        }
+
+        .navbar-brand {
+            color: #fff;
+            font-size: 1.5rem;
+            text-transform: uppercase;
+        }
+
+        .mainbox-logo {
+            text-align: center;
+            margin-top: 2rem;
+        }
+
+        .mainbox-logo img {
+            width: 150px;
+            height: auto;
+        }
+
+        .rainbow-line {
+            height: 4px;
+            background: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet);
+            margin: 1rem 0;
+        }
+
+        .form-4 {
+            max-width: 400px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            padding: 1.5rem;
+        }
+
+        .form-4 .form-control {
+            margin-bottom: 1rem;
+        }
+
+        .color-change-5x {
+            background: #007bff;
+            color: #fff;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .color-change-5x:hover {
+            background: #0056b3;
+        }
+
+        .timer-container {
+            max-width: 400px;
+            margin: 2rem auto;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .timer-container h2 {
+            margin-bottom: 1rem;
+            font-size: 1.25rem;
+            color: #333;
+        }
+
+        .timer {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #007bff;
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="container-fluid">
+        <span class="navbar-brand">MILWAN WIFI.APP</span>
+    </div>
+</nav>
+
+<div class="mainbox-logo">
+    <img src="milwan wifi.png" alt="MILWAN Logo">
+    <div class="rainbow-line"></div>
+</div>
+
+<div id="loginPage" class="form-4">
+    <form id="loginForm">
+        <input id="usernameInput" class="form-control" type="text" placeholder="Masukkan username" required>
+        <input id="voucherInput" class="form-control" type="text" placeholder="Masukkan kode voucher" required>
+        <button id="submitButton" type="submit" class="color-change-5x">LOGIN</button>
+    </form>
+    <div id="notif" style="display: none; color: red; text-align: center; margin-top: 1rem;">Kode salah</div>
+</div>
+
+<div id="timerPage" class="timer-container" style="display: none;">
+    <h2>Selamat datang, <span id="usernameDisplay"></span>!</h2>
+    <div>Sisa waktu:</div>
+    <div class="timer" id="timer">00:00:00</div>
+</div>
+
+<script>
+    const voucherCodes = {
+        "d7b2sdf": 7200,   // 2 jam
+        "b7b3sdf": 10800,  // 3 jam
+        "c7b5sdf": 18000,  // 5 jam
+        "f7b24sdf": 86400  // 24 jam
+    };
+
+    const loginForm = document.getElementById('loginForm');
+    const usernameInput = document.getElementById('usernameInput');
+    const voucherInput = document.getElementById('voucherInput');
+    const submitButton = document.getElementById('submitButton');
+    const notif = document.getElementById('notif');
+    const timerPage = document.getElementById('timerPage');
+    const loginPage = document.getElementById('loginPage');
+    const timerDisplay = document.getElementById('timer');
+    const usernameDisplay = document.getElementById('usernameDisplay');
+
+    function saveTimerState(username, duration) {
+        const endTime = Date.now() + duration * 1000;
+        localStorage.setItem('endTime', endTime);
+        localStorage.setItem('isActive', true);
+        localStorage.setItem('username', username);
+    }
+
+    function startTimer(duration) {
+        let timer = duration;
+        const interval = setInterval(() => {
+            const hours = Math.floor(timer / 3600);
+            const minutes = Math.floor((timer % 3600) / 60);
+            const seconds = timer % 60;
+            
+            timerDisplay.textContent = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+
+            if (timer <= 0) {
+                clearInterval(interval);
+                localStorage.removeItem('endTime');
+                localStorage.removeItem('isActive');
+                localStorage.removeItem('username');
+                alert('Waktu habis!');
+                location.reload();
+            }
+
+            timer--;
+        }, 1000);
+    }
+
+    function checkExistingTimer() {
+        const isActive = localStorage.getItem('isActive');
+        const endTime = localStorage.getItem('endTime');
+        const username = localStorage.getItem('username');
+
+        if (isActive && endTime && username) {
+            const remainingTime = Math.floor((endTime - Date.now()) / 1000);
+
+            if (remainingTime > 0) {
+                loginPage.style.display = 'none';
+                timerPage.style.display = 'block';
+                usernameDisplay.textContent = username;
+                startTimer(remainingTime);
+            } else {
+                localStorage.clear();
+            }
+        }
+    }
+
+    loginForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const enteredUsername = usernameInput.value;
+        const enteredCode = voucherInput.value.toUpperCase();
+
+        if (voucherCodes[enteredCode]) {
+            notif.style.display = 'none';
+            loginPage.style.display = 'none';
+            timerPage.style.display = 'block';
+            usernameDisplay.textContent = enteredUsername;
+
+            saveTimerState(enteredUsername, voucherCodes[enteredCode]);
+            startTimer(voucherCodes[enteredCode]);
+        } else {
+            notif.textContent = 'Kode salah';
+            notif.style.display = 'block';
+        }
+    });
+
+    checkExistingTimer();
+</script>
+
+</body>
+</html>
