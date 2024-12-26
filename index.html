@@ -201,7 +201,9 @@
 
             if (timer <= 0) {
                 clearInterval(interval);
-                localStorage.clear();
+                localStorage.removeItem('endTime');
+                localStorage.removeItem('isActive');
+                localStorage.removeItem('username');
                 alert('Waktu habis!');
                 location.reload();
             }
@@ -231,8 +233,14 @@
 
     loginForm.addEventListener('submit', (e) => {
         e.preventDefault();
-        const enteredUsername = usernameInput.value;
-        const enteredCode = voucherInput.value.toUpperCase();
+        const enteredUsername = usernameInput.value.trim();
+        const enteredCode = voucherInput.value.toUpperCase().trim();
+
+        if (!enteredUsername || !enteredCode) {
+            notif.textContent = 'Username atau kode voucher tidak boleh kosong.';
+            notif.style.display = 'block';
+            return;
+        }
 
         const cooldownEnd = localStorage.getItem(`voucher_${enteredCode}`);
         if (cooldownEnd && Date.now() < cooldownEnd) {
@@ -250,7 +258,7 @@
             saveTimerState(enteredUsername, voucherCodes[enteredCode].duration, enteredCode);
             startTimer(voucherCodes[enteredCode].duration);
         } else {
-            notif.textContent = 'Kode salah';
+            notif.textContent = 'Kode voucher salah.';
             notif.style.display = 'block';
         }
     });
