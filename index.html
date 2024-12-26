@@ -155,39 +155,27 @@
 
 <script>
     const voucherCodes = {
-        "d7b2asd": { duration: 7200, cooldown: 86400 },   // 2 jam, cooldown 1 hari
-        "d7b2cba": { duration: 7200, cooldown: 86400 },
-        "d7b2sdf": { duration: 7200, cooldown: 86400 },
-        "d7b2bhj": { duration: 7200, cooldown: 86400 },
-        "b7b3qwe": { duration: 10800, cooldown: 86400 },  // 3 jam, cooldown 1 hari
-        "b7b3klh": { duration: 10800, cooldown: 86400 },
-        "b7b3mlp": { duration: 10800, cooldown: 86400 },
-        "b7b3sdf": { duration: 10800, cooldown: 86400 },
-        "c7b5tgb": { duration: 18000, cooldown: 86400 },  // 5 jam, cooldown 1 hari
-        "c7b5bjn": { duration: 18000, cooldown: 86400 },
-        "c7b5fhg": { duration: 18000, cooldown: 86400 },
-        "c7b5sdf": { duration: 18000, cooldown: 86400 },
-        "f7b24sdf": { duration: 86400, cooldown: 172800 }, // 24 jam, cooldown 2 hari
-        "f7b24cab": { duration: 86400, cooldown: 172800 },
-        "f7b24yui": { duration: 86400, cooldown: 172800 },
-        "f7b24vgu": { duration: 86400, cooldown: 172800 }
+        "d7b2sdf": 7200,   // 2 jam
+        "b7b3sdf": 10800,  // 3 jam
+        "c7b5sdf": 18000,  // 5 jam
+        "f7b24sdf": 86400  // 24 jam
     };
 
     const loginForm = document.getElementById('loginForm');
     const usernameInput = document.getElementById('usernameInput');
     const voucherInput = document.getElementById('voucherInput');
+    const submitButton = document.getElementById('submitButton');
     const notif = document.getElementById('notif');
     const timerPage = document.getElementById('timerPage');
     const loginPage = document.getElementById('loginPage');
     const timerDisplay = document.getElementById('timer');
     const usernameDisplay = document.getElementById('usernameDisplay');
 
-    function saveTimerState(username, duration, voucherCode) {
+    function saveTimerState(username, duration) {
         const endTime = Date.now() + duration * 1000;
         localStorage.setItem('endTime', endTime);
         localStorage.setItem('isActive', true);
         localStorage.setItem('username', username);
-        localStorage.setItem(`voucher_${voucherCode}`, Date.now() + voucherCodes[voucherCode].cooldown * 1000);
     }
 
     function startTimer(duration) {
@@ -196,8 +184,9 @@
             const hours = Math.floor(timer / 3600);
             const minutes = Math.floor((timer % 3600) / 60);
             const seconds = timer % 60;
+            
+            timerDisplay.textContent = ${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')};
 
-            timerDisplay.textContent = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 
             if (timer <= 0) {
                 clearInterval(interval);
@@ -233,21 +222,8 @@
 
     loginForm.addEventListener('submit', (e) => {
         e.preventDefault();
-        const enteredUsername = usernameInput.value.trim();
-        const enteredCode = voucherInput.value.toUpperCase().trim();
-
-        if (!enteredUsername || !enteredCode) {
-            notif.textContent = 'Username atau kode voucher tidak boleh kosong.';
-            notif.style.display = 'block';
-            return;
-        }
-
-        const cooldownEnd = localStorage.getItem(`voucher_${enteredCode}`);
-        if (cooldownEnd && Date.now() < cooldownEnd) {
-            notif.textContent = 'Kode voucher sudah digunakan. Silakan coba lagi nanti.';
-            notif.style.display = 'block';
-            return;
-        }
+        const enteredUsername = usernameInput.value;
+        const enteredCode = voucherInput.value.toUpperCase();
 
         if (voucherCodes[enteredCode]) {
             notif.style.display = 'none';
@@ -255,10 +231,10 @@
             timerPage.style.display = 'block';
             usernameDisplay.textContent = enteredUsername;
 
-            saveTimerState(enteredUsername, voucherCodes[enteredCode].duration, enteredCode);
-            startTimer(voucherCodes[enteredCode].duration);
+            saveTimerState(enteredUsername, voucherCodes[enteredCode]);
+            startTimer(voucherCodes[enteredCode]);
         } else {
-            notif.textContent = 'Kode voucher salah.';
+            notif.textContent = 'Kode salah';
             notif.style.display = 'block';
         }
     });
