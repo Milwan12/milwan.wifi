@@ -113,6 +113,40 @@
     <div id="notif" style="display: none; color: red; text-align: center; margin-top: 1rem;">Kode salah</div>
 </div>
 
+<div class="voucher-pricing mt-4">
+    <h5 class="text-center">Daftar Harga Voucher Wifi</h5>
+    <div class="pricing-grid">
+        <div class="price-box">2 Jam - Rp2.000</div>
+        <div class="price-box">3 Jam - Rp3.000</div>
+        <div class="price-box">5 Jam - Rp5.000</div>
+        <div class="price-box">24 Jam - Rp10.000</div>
+    </div>
+</div>
+<style>
+    .voucher-pricing {
+        text-align: center;
+    }
+
+    .pricing-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+        max-width: 400px;
+        margin: 0 auto;
+    }
+
+    .price-box {
+        background-color: #007bff;
+        color: #fff;
+        padding: 10px;
+        border-radius: 5px;
+        font-weight: bold;
+        text-align: center;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+</style>
+
+
 <div id="timerPage" class="timer-container" style="display: none;">
     <h2>Selamat datang, <span id="usernameDisplay"></span>!</h2>
     <div>Sisa waktu:</div>
@@ -223,6 +257,5 @@
 
     checkExistingTimer();
 </script>
-
 </body>
 </html>
