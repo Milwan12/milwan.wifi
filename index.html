@@ -137,6 +137,8 @@
     const timerDisplay = document.getElementById('timer');
     const usernameDisplay = document.getElementById('usernameDisplay');
 
+    let activeTimer = null;
+
     function saveTimerState(username, duration) {
         const endTime = Date.now() + duration * 1000;
         localStorage.setItem('endTime', endTime);
@@ -145,20 +147,21 @@
     }
 
     function startTimer(duration) {
+        if (activeTimer) {
+            clearInterval(activeTimer);
+        }
+
         let timer = duration;
-        const interval = setInterval(() => {
+        activeTimer = setInterval(() => {
             const hours = Math.floor(timer / 3600);
             const minutes = Math.floor((timer % 3600) / 60);
             const seconds = timer % 60;
-            
+
             timerDisplay.textContent = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 
-
             if (timer <= 0) {
-                clearInterval(interval);
-                localStorage.removeItem('endTime');
-                localStorage.removeItem('isActive');
-                localStorage.removeItem('username');
+                clearInterval(activeTimer);
+                localStorage.clear();
                 alert('Waktu habis!');
                 location.reload();
             }
@@ -188,8 +191,8 @@
 
     loginForm.addEventListener('submit', (e) => {
         e.preventDefault();
-        const enteredUsername = usernameInput.value;
-        const enteredCode = voucherInput.value.toUpperCase();
+        const enteredUsername = usernameInput.value.trim();
+        const enteredCode = voucherInput.value.trim().toLowerCase();
 
         if (voucherCodes[enteredCode]) {
             notif.style.display = 'none';
@@ -207,6 +210,7 @@
 
     checkExistingTimer();
 </script>
+
 
 </body>
 </html>
